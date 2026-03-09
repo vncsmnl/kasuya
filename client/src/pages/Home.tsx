@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChefHat, Coffee, Zap, Scale, Heart, Feather, Gauge, Flame } from "lucide-react";
 import RecipeTimerModal from "@/components/RecipeTimerModal";
 import FavoriteRecipes from "@/components/FavoriteRecipes";
@@ -35,6 +36,7 @@ interface Pour {
 
 export default function Home() {
   const [coffeeWeight, setCoffeeWeight] = useState<number>(20);
+  const [ratio, setRatio] = useState<number>(15);
   const [flavor, setFlavor] = useState<string>("balanced");
   const [intensity, setIntensity] = useState<string>("medium");
   const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -46,8 +48,8 @@ export default function Home() {
   // First 40% of water: adjusts flavor profile (acidity vs sweetness)
   // Last 60% of water: adjusts intensity (body and strength)
   const calculateRecipe = () => {
-    // Standard ratio: 1:15 (coffee:water)
-    const waterTotal = Math.round(coffeeWeight * 15);
+    // Standard ratio: 1:ratio (coffee:water)
+    const waterTotal = Math.round(coffeeWeight * ratio);
     const water40 = Math.round(waterTotal * 0.4);
     const water60 = Math.round(waterTotal * 0.6);
 
@@ -207,7 +209,35 @@ export default function Home() {
                     className="font-mono text-lg"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Água total: {Math.round(coffeeWeight * 15)}ml (proporção 1:15)
+                    Água total: {Math.round(coffeeWeight * ratio)}ml (proporção 1:{ratio})
+                  </p>
+                </div>
+
+                {/* Ratio Selector */}
+                <div className="space-y-3">
+                  <Label htmlFor="ratio" className="text-sm font-medium">
+                    Proporção - Café : Água
+                  </Label>
+                  <Select
+                    value={String(ratio)}
+                    onValueChange={(v) => setRatio(Number(v))}
+                  >
+                    <SelectTrigger id="ratio" className="font-mono text-lg">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[12, 13, 14, 15, 16, 17, 18].map((r) => (
+                        <SelectItem key={r} value={String(r)} className="font-mono">
+                          1:{r} — {coffeeWeight}g : {Math.round(coffeeWeight * r)}ml
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Proporções menores = café mais forte.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Maiores = mais suave.
                   </p>
                 </div>
 
