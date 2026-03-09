@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ChefHat, Coffee } from "lucide-react";
+import { ChefHat, Coffee, Zap, Scale, Heart, Feather, Gauge, Flame } from "lucide-react";
 import RecipeTimerModal from "@/components/RecipeTimerModal";
 import FavoriteRecipes from "@/components/FavoriteRecipes";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -224,7 +224,7 @@ export default function Home() {
                         htmlFor="acidity"
                         className="flex-1 cursor-pointer font-normal text-foreground"
                       >
-                        <span className="font-medium">Acidez</span>
+                        <span className="font-medium flex items-center gap-2"><Zap className="w-4 h-4 text-yellow-500" />Acidez</span>
                         <p className="text-xs text-muted-foreground mt-1">
                           Mais brilhante e vivaz
                         </p>
@@ -236,7 +236,7 @@ export default function Home() {
                         htmlFor="balanced"
                         className="flex-1 cursor-pointer font-normal text-foreground"
                       >
-                        <span className="font-medium">Equilibrado</span>
+                        <span className="font-medium flex items-center gap-2"><Scale className="w-4 h-4 text-blue-500" />Equilibrado</span>
                         <p className="text-xs text-muted-foreground mt-1">
                           Harmonia perfeita entre sabores
                         </p>
@@ -248,7 +248,7 @@ export default function Home() {
                         htmlFor="sweetness"
                         className="flex-1 cursor-pointer font-normal text-foreground"
                       >
-                        <span className="font-medium">Doçura</span>
+                        <span className="font-medium flex items-center gap-2"><Heart className="w-4 h-4 text-pink-500" />Doçura</span>
                         <p className="text-xs text-muted-foreground mt-1">
                           Mais suave e adocicado
                         </p>
@@ -270,7 +270,7 @@ export default function Home() {
                         htmlFor="soft"
                         className="flex-1 cursor-pointer font-normal text-foreground"
                       >
-                        <span className="font-medium">Suave</span>
+                        <span className="font-medium flex items-center gap-2"><Feather className="w-4 h-4 text-sky-400" />Suave</span>
                         <p className="text-xs text-muted-foreground mt-1">
                           Corpo leve e limpo
                         </p>
@@ -282,7 +282,7 @@ export default function Home() {
                         htmlFor="medium"
                         className="flex-1 cursor-pointer font-normal text-foreground"
                       >
-                        <span className="font-medium">Médio</span>
+                        <span className="font-medium flex items-center gap-2"><Gauge className="w-4 h-4 text-orange-400" />Médio</span>
                         <p className="text-xs text-muted-foreground mt-1">
                           Corpo equilibrado
                         </p>
@@ -294,7 +294,7 @@ export default function Home() {
                         htmlFor="strong"
                         className="flex-1 cursor-pointer font-normal text-foreground"
                       >
-                        <span className="font-medium">Forte</span>
+                        <span className="font-medium flex items-center gap-2"><Flame className="w-4 h-4 text-red-500" />Forte</span>
                         <p className="text-xs text-muted-foreground mt-1">
                           Corpo completo e intenso
                         </p>
