@@ -178,6 +178,10 @@ export default function Home() {
             <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
               Calcule sua receita perfeita usando o método 4:6 de Tetsu Kasuya. Customize o perfil
               de sabor e intensidade para obter o café ideal.
+              <br />
+              <br />
+              {/* Japanese Text */}
+              テツ・カスヤの4:6メソッドを使って、あなたにぴったりのレシピを計算しましょう。理想のコーヒーを得るために、風味プロファイルと濃さをカスタマイズしてください。
             </p>
           </div>
         </div>
@@ -482,13 +486,13 @@ export default function Home() {
         <div className="container">
           <div className="max-w-2xl">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              O método 4:6 de Tetsu Kasuya divide a água em 40% (para sabor) e 60% (para
-              intensidade), permitindo controle preciso sobre o perfil da sua xícara. Desenvolvido
-              pelo campeão mundial de café, este método revolucionou a forma como preparamos café
-              filtrado.
+              テツ・カスヤの4:6メソッドは、お湯を40％（風味のため）と60％（濃度のため）に分けることで、
+              カップのプロファイルを精密にコントロールできるようにします。世界チャンピオンのコーヒー
+              競技者によって開発されたこのメソッドは、私たちがドリップコーヒーを淹れる方法に変革を
+              もたらしました。
             </p>
             <p className="text-xs text-muted-foreground mt-6">
-              Calculadora Kasuya 4:6 • Método de Tetsu Kasuya
+              テツ・カスヤの4:6メソッド • Kasuya 4:6 Method
             </p>
           </div>
         </div>
