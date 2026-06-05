@@ -7,6 +7,8 @@ export interface SavedRecipe {
   flavor: string;
   intensity: string;
   createdAt: number;
+  ratio?: number;
+  waterTotal?: number;
 }
 
 const STORAGE_KEY = "kasuya_favorite_recipes";
@@ -44,7 +46,9 @@ export function useFavoriteRecipes() {
     name: string,
     coffeeWeight: number,
     flavor: string,
-    intensity: string
+    intensity: string,
+    ratio?: number,
+    waterTotal?: number
   ): SavedRecipe => {
     const newRecipe: SavedRecipe = {
       id: Date.now().toString(),
@@ -53,6 +57,8 @@ export function useFavoriteRecipes() {
       flavor,
       intensity,
       createdAt: Date.now(),
+      ratio,
+      waterTotal,
     };
 
     setRecipes((prev) => [newRecipe, ...prev]);
@@ -68,12 +74,14 @@ export function useFavoriteRecipes() {
     name: string,
     coffeeWeight: number,
     flavor: string,
-    intensity: string
+    intensity: string,
+    ratio?: number,
+    waterTotal?: number
   ) => {
     setRecipes((prev) =>
       prev.map((recipe) =>
         recipe.id === id
-          ? { ...recipe, name, coffeeWeight, flavor, intensity }
+          ? { ...recipe, name, coffeeWeight, flavor, intensity, ratio, waterTotal }
           : recipe
       )
     );

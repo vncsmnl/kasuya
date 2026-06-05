@@ -26,10 +26,19 @@ interface FavoriteRecipesProps {
   recipes: SavedRecipe[];
   onLoadRecipe: (recipe: SavedRecipe) => void;
   onDeleteRecipe: (id: string) => void;
-  onAddRecipe: (name: string, coffeeWeight: number, flavor: string, intensity: string) => void;
+  onAddRecipe: (
+    name: string,
+    coffeeWeight: number,
+    flavor: string,
+    intensity: string,
+    ratio?: number,
+    waterTotal?: number
+  ) => void;
   currentCoffeeWeight: number;
   currentFlavor: string;
   currentIntensity: string;
+  currentRatio?: number;
+  currentWaterTotal?: number;
 }
 
 export default function FavoriteRecipes({
@@ -40,13 +49,22 @@ export default function FavoriteRecipes({
   currentCoffeeWeight,
   currentFlavor,
   currentIntensity,
+  currentRatio = 15,
+  currentWaterTotal = 300,
 }: FavoriteRecipesProps) {
   const [newRecipeName, setNewRecipeName] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSaveRecipe = () => {
     if (newRecipeName.trim()) {
-      onAddRecipe(newRecipeName, currentCoffeeWeight, currentFlavor, currentIntensity);
+      onAddRecipe(
+        newRecipeName,
+        currentCoffeeWeight,
+        currentFlavor,
+        currentIntensity,
+        currentRatio,
+        currentWaterTotal
+      );
       setNewRecipeName("");
       setIsOpen(false);
     }
@@ -110,7 +128,7 @@ export default function FavoriteRecipes({
                 </div>
                 <div>
                   <p className="text-muted-foreground">
-                    Água: {Math.round(currentCoffeeWeight * 15)}ml
+                    Água: {currentWaterTotal}ml (1:{currentRatio})
                   </p>
                   <p className="text-muted-foreground">
                     Intensidade: {getIntensityLabel(currentIntensity)}
@@ -145,7 +163,7 @@ export default function FavoriteRecipes({
                     <div className="grid grid-cols-2 gap-2 mt-2 text-xs text-muted-foreground">
                       <p>Café: {recipe.coffeeWeight}g</p>
                       <p>Perfil: {getFlavorLabel(recipe.flavor)}</p>
-                      <p>Água: {Math.round(recipe.coffeeWeight * 15)}ml</p>
+                      <p>Água: {recipe.waterTotal ?? Math.round(recipe.coffeeWeight * (recipe.ratio ?? 15))}ml (1:{recipe.ratio ?? 15})</p>
                       <p>Intensidade: {getIntensityLabel(recipe.intensity)}</p>
                     </div>
                   </div>

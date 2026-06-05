@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChefHat, Coffee, Zap, Scale, Heart, Feather, Gauge, Flame } from "lucide-react";
+import { ChefHat, Coffee, Zap, Scale, Heart, Feather, Gauge, Flame, Lock, Unlock } from "lucide-react";
 import RecipeTimerModal from "@/components/RecipeTimerModal";
 import FavoriteRecipes from "@/components/FavoriteRecipes";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -35,23 +34,73 @@ interface Pour {
 }
 
 export default function Home() {
-  const [coffeeWeight, setCoffeeWeight] = useState<number>(20);
-  const [ratio, setRatio] = useState<number>(15);
+  const [coffeeVal, setCoffeeVal] = useState<string>("20");
+  const [waterVal, setWaterVal] = useState<string>("300");
+  const [ratioVal, setRatioVal] = useState<string>("15");
+  const [isWaterLocked, setIsWaterLocked] = useState<boolean>(true);
+  const [isRatioLocked, setIsRatioLocked] = useState<boolean>(true);
+
   const [flavor, setFlavor] = useState<string>("balanced");
   const [intensity, setIntensity] = useState<string>("medium");
   const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [showRecipe, setShowRecipe] = useState(false);
 
   const { recipes, isLoaded, addRecipe, deleteRecipe } = useFavoriteRecipes();
 
-  // Kasuya 4:6 Method Calculation
-  // First 40% of water: adjusts flavor profile (acidity vs sweetness)
-  // Last 60% of water: adjusts intensity (body and strength)
-  const calculateRecipe = () => {
-    // Standard ratio: 1:ratio (coffee:water)
-    const waterTotal = Math.round(coffeeWeight * ratio);
-    const water40 = Math.round(waterTotal * 0.4);
-    const water60 = Math.round(waterTotal * 0.6);
+  useEffect(() => {
+    const c = Number(coffeeVal);
+    const r = Number(ratioVal);
+    const w = Number(waterVal);
+    if (!isNaN(c) && c > 0 && !isNaN(r) && r > 0 && !isNaN(w) && w > 0) {
+      performCalculation(c, r, w, flavor, intensity);
+    }
+  }, [coffeeVal, ratioVal, waterVal, flavor, intensity]);
+
+  const handleCoffeeChange = (newVal: string) => {
+    setCoffeeVal(newVal);
+    const parsedCoffee = Number(newVal);
+    if (!isNaN(parsedCoffee) && parsedCoffee > 0) {
+      const parsedRatio = Number(ratioVal) || 15;
+      if (isWaterLocked) {
+        setWaterVal(Math.round(parsedCoffee * parsedRatio).toString());
+      } else if (isRatioLocked) {
+        setWaterVal(Math.round(parsedCoffee * parsedRatio).toString());
+      } else {
+        setWaterVal(Math.round(parsedCoffee * parsedRatio).toString());
+      }
+    }
+  };
+
+  const handleWaterChange = (newVal: string) => {
+    setWaterVal(newVal);
+    const parsedWater = Number(newVal);
+    const parsedCoffee = Number(coffeeVal) || 20;
+    if (!isNaN(parsedWater) && parsedWater > 0 && parsedCoffee > 0) {
+      const computedRatio = (parsedWater / parsedCoffee).toFixed(1);
+      const formattedRatio = computedRatio.endsWith(".0")
+        ? computedRatio.slice(0, -2)
+        : computedRatio;
+      setRatioVal(formattedRatio);
+    }
+  };
+
+  const handleRatioChange = (newVal: string) => {
+    setRatioVal(newVal);
+    const parsedRatio = Number(newVal);
+    const parsedCoffee = Number(coffeeVal) || 20;
+    if (!isNaN(parsedRatio) && parsedRatio > 0) {
+      setWaterVal(Math.round(parsedCoffee * parsedRatio).toString());
+    }
+  };
+
+  const performCalculation = (
+    c: number,
+    r: number,
+    w: number,
+    f: string,
+    i: string
+  ) => {
+    const water40 = Math.round(w * 0.4);
+    const water60 = Math.round(w * 0.6);
 
     let pours: Pour[] = [];
 
@@ -62,10 +111,10 @@ export default function Home() {
     let firstPourWeight: number;
     let secondPourWeight: number;
 
-    if (flavor === "acidity") {
+    if (f === "acidity") {
       firstPourWeight = Math.round(water40 * 0.6);
       secondPourWeight = water40 - firstPourWeight;
-    } else if (flavor === "sweetness") {
+    } else if (f === "sweetness") {
       firstPourWeight = Math.round(water40 * 0.4);
       secondPourWeight = water40 - firstPourWeight;
     } else {
@@ -94,9 +143,9 @@ export default function Home() {
     // Strong: 3 equal pours (20% each)
     let intensityPours: { weight: number; type: string }[] = [];
 
-    if (intensity === "soft") {
+    if (i === "soft") {
       intensityPours = [{ weight: water60, type: "Intensidade" }];
-    } else if (intensity === "medium") {
+    } else if (i === "medium") {
       const mediumPour = Math.round(water60 / 2);
       intensityPours = [
         { weight: mediumPour, type: "Intensidade" },
@@ -124,25 +173,29 @@ export default function Home() {
     });
 
     const flavorLabel =
-      flavor === "acidity" ? "Ácido" : flavor === "sweetness" ? "Doce" : "Equilibrado";
+      f === "acidity" ? "Ácido" : f === "sweetness" ? "Doce" : "Equilibrado";
     const intensityLabel =
-      intensity === "soft" ? "Suave" : intensity === "medium" ? "Médio" : "Forte";
+      i === "soft" ? "Suave" : i === "medium" ? "Médio" : "Forte";
 
     setRecipe({
-      coffeeWeight,
-      waterTotal,
+      coffeeWeight: c,
+      waterTotal: w,
       flavor: flavorLabel,
       intensity: intensityLabel,
       pours,
     });
-    setShowRecipe(true);
   };
 
   const handleLoadRecipe = (savedRecipe: SavedRecipe) => {
-    setCoffeeWeight(savedRecipe.coffeeWeight);
+    const savedCoffee = savedRecipe.coffeeWeight;
+    const savedRatio = savedRecipe.ratio ?? (Number(ratioVal) || 15);
+    const savedWater = savedRecipe.waterTotal ?? Math.round(savedCoffee * savedRatio);
+
+    setCoffeeVal(savedCoffee.toString());
+    setRatioVal(savedRatio.toString());
+    setWaterVal(savedWater.toString());
     setFlavor(savedRecipe.flavor);
     setIntensity(savedRecipe.intensity);
-    calculateRecipe();
   };
 
   return (
@@ -198,50 +251,107 @@ export default function Home() {
                 <CardDescription>Defina os parâmetros da sua receita</CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
-                {/* Coffee Weight Input */}
+                {/* Café (g) Input */}
                 <div className="space-y-3">
                   <Label htmlFor="coffee-weight" className="text-sm font-medium">
-                    Peso do Café (gramas)
+                    Café (g)
                   </Label>
                   <Input
                     id="coffee-weight"
                     type="number"
-                    min="10"
-                    max="50"
-                    value={coffeeWeight}
-                    onChange={(e) => setCoffeeWeight(Number(e.target.value))}
+                    value={coffeeVal}
+                    onChange={(e) => handleCoffeeChange(e.target.value)}
                     className="font-mono text-lg"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Água total: {Math.round(coffeeWeight * ratio)}ml (proporção 1:{ratio})
+                    Quantidade de grãos de café moídos.
                   </p>
                 </div>
 
-                {/* Ratio Selector */}
+                {/* Água (ml) Input with Lock */}
+                <div className="space-y-3">
+                  <Label htmlFor="water-weight" className="text-sm font-medium">
+                    Água (ml)
+                  </Label>
+                  <div className="relative flex items-center">
+                    <Input
+                      id="water-weight"
+                      type="number"
+                      value={waterVal}
+                      onChange={(e) => handleWaterChange(e.target.value)}
+                      readOnly={isWaterLocked}
+                      className={`font-mono text-lg pr-10 ${isWaterLocked
+                          ? "cursor-pointer bg-secondary/40 text-muted-foreground border-dashed"
+                          : ""
+                        }`}
+                      onClick={() => {
+                        if (isWaterLocked) {
+                          setIsWaterLocked(false);
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsWaterLocked(!isWaterLocked);
+                      }}
+                      className="absolute right-3 p-1 rounded-sm hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                      title={isWaterLocked ? "Clique para desbloquear e editar" : "Clique para bloquear"}
+                    >
+                      {isWaterLocked ? (
+                        <Lock className="w-4 h-4 text-muted-foreground" />
+                      ) : (
+                        <Unlock className="w-4 h-4 text-primary" />
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Volume total de água para a extração.
+                  </p>
+                </div>
+
+                {/* Proporção Input with Lock */}
                 <div className="space-y-3">
                   <Label htmlFor="ratio" className="text-sm font-medium">
-                    Proporção - Café : Água
+                    Proporção
                   </Label>
-                  <Select
-                    value={String(ratio)}
-                    onValueChange={(v) => setRatio(Number(v))}
-                  >
-                    <SelectTrigger id="ratio" className="font-mono text-lg">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[12, 13, 14, 15, 16, 17, 18].map((r) => (
-                        <SelectItem key={r} value={String(r)} className="font-mono">
-                          1:{r} — {coffeeWeight}g : {Math.round(coffeeWeight * r)}ml
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="relative flex items-center">
+                    <Input
+                      id="ratio"
+                      type="number"
+                      step="0.1"
+                      value={ratioVal}
+                      onChange={(e) => handleRatioChange(e.target.value)}
+                      readOnly={isRatioLocked}
+                      className={`font-mono text-lg pr-10 ${isRatioLocked
+                          ? "cursor-pointer bg-secondary/40 text-muted-foreground border-dashed"
+                          : ""
+                        }`}
+                      onClick={() => {
+                        if (isRatioLocked) {
+                          setIsRatioLocked(false);
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsRatioLocked(!isRatioLocked);
+                      }}
+                      className="absolute right-3 p-1 rounded-sm hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                      title={isRatioLocked ? "Clique para desbloquear e editar" : "Clique para bloquear"}
+                    >
+                      {isRatioLocked ? (
+                        <Lock className="w-4 h-4 text-muted-foreground" />
+                      ) : (
+                        <Unlock className="w-4 h-4 text-primary" />
+                      )}
+                    </button>
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    Proporções menores = café mais forte.
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Maiores = mais suave.
+                    Proporção de extração (Café para Água).
                   </p>
                 </div>
 
@@ -336,15 +446,6 @@ export default function Home() {
                     </div>
                   </RadioGroup>
                 </div>
-
-                {/* Calculate Button */}
-                <Button
-                  onClick={calculateRecipe}
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 transition-smooth"
-                >
-                  <ChefHat className="w-4 h-4 mr-2" />
-                  Ver Receita
-                </Button>
               </CardContent>
             </Card>
 
@@ -355,16 +456,18 @@ export default function Home() {
                 onLoadRecipe={handleLoadRecipe}
                 onDeleteRecipe={deleteRecipe}
                 onAddRecipe={addRecipe}
-                currentCoffeeWeight={coffeeWeight}
+                currentCoffeeWeight={Number(coffeeVal) || 20}
                 currentFlavor={flavor}
                 currentIntensity={intensity}
+                currentRatio={Number(ratioVal) || 15}
+                currentWaterTotal={Number(waterVal) || 300}
               />
             )}
           </div>
 
           {/* Right Column: Recipe Display and Timer */}
           <div className="lg:col-span-2 space-y-8">
-            {showRecipe && recipe && (
+            {recipe && (
               <>
                 {/* Recipe Summary */}
                 <Card className="border-border shadow-minimal animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -466,14 +569,13 @@ export default function Home() {
               </>
             )}
 
-            {!showRecipe && (
+            {!recipe && (
               <div className="h-96 flex items-center justify-center">
                 <div className="text-center space-y-4">
                   <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto">
                     <Coffee className="w-8 h-8 text-muted-foreground" />
                   </div>
-                  <p className="text-muted-foreground">Configure seus parâmetros e clique em</p>
-                  <p className="font-medium text-foreground">"Ver Receita"</p>
+                  <p className="text-muted-foreground">Insira valores válidos para calcular a receita</p>
                 </div>
               </div>
             )}
