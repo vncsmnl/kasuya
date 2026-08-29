@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export interface SavedRecipe {
   id: string;
@@ -11,38 +11,35 @@ export interface SavedRecipe {
   waterTotal?: number;
 }
 
-const STORAGE_KEY = "kasuya_favorite_recipes";
+const STORAGE_KEY = "kasuya_favorite_recipes_v1";
+
+function loadInitialRecipes(): SavedRecipe[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return Array.isArray(parsed) ? parsed : [];
+    }
+  } catch (error) {
+    console.error("Error loading favorite recipes:", error);
+  }
+  return [];
+}
 
 export function useFavoriteRecipes() {
-  const [recipes, setRecipes] = useState<SavedRecipe[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // Load recipes from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setRecipes(Array.isArray(parsed) ? parsed : []);
-      }
-    } catch (error) {
-      console.error("Error loading favorite recipes:", error);
-    }
-    setIsLoaded(true);
-  }, []);
+  const [recipes, setRecipes] = useState<SavedRecipe[]>(loadInitialRecipes);
+  const isLoaded = true;
 
   // Save recipes to localStorage whenever they change
   useEffect(() => {
-    if (isLoaded) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
-      } catch (error) {
-        console.error("Error saving favorite recipes:", error);
-      }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+    } catch (error) {
+      console.error("Error saving favorite recipes:", error);
     }
-  }, [recipes, isLoaded]);
+  }, [recipes]);
 
-  const addRecipe = (
+  const addRecipe = useCallback((
     name: string,
     coffeeWeight: number,
     flavor: string,
@@ -63,13 +60,13 @@ export function useFavoriteRecipes() {
 
     setRecipes((prev) => [newRecipe, ...prev]);
     return newRecipe;
-  };
+  }, []);
 
-  const deleteRecipe = (id: string) => {
+  const deleteRecipe = useCallback((id: string) => {
     setRecipes((prev) => prev.filter((recipe) => recipe.id !== id));
-  };
+  }, []);
 
-  const updateRecipe = (
+  const updateRecipe = useCallback((
     id: string,
     name: string,
     coffeeWeight: number,
@@ -85,7 +82,7 @@ export function useFavoriteRecipes() {
           : recipe
       )
     );
-  };
+  }, []);
 
   return {
     recipes,

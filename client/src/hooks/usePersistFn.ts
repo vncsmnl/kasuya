@@ -1,20 +1,20 @@
-import { useRef } from "react";
+import { useRef, useLayoutEffect, useEffect, useCallback } from "react";
 
 type noop = (...args: any[]) => any;
 
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 /**
- * usePersistFn instead of useCallback to reduce cognitive load
+ * usePersistFn returns a function with a stable identity while always invoking the latest callback.
  */
-export function usePersistFn<T extends noop>(fn: T) {
+export function usePersistFn<T extends noop>(fn: T): T {
   const fnRef = useRef<T>(fn);
-  fnRef.current = fn;
 
-  const persistFn = useRef<T>(null);
-  if (!persistFn.current) {
-    persistFn.current = function (this: unknown, ...args) {
-      return fnRef.current!.apply(this, args);
-    } as T;
-  }
+  useIsomorphicLayoutEffect(() => {
+    fnRef.current = fn;
+  });
 
-  return persistFn.current!;
+  return useCallback(((...args: any[]) => {
+    return fnRef.current(...args);
+  }) as T, []);
 }

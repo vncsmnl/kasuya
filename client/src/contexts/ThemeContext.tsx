@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
 
 type Theme = "light" | "dark";
 
@@ -23,7 +23,7 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
     try {
-      const stored = localStorage.getItem("kasuya_theme");
+      const stored = localStorage.getItem("kasuya_theme_v1");
       if (stored === "light" || stored === "dark") {
         return stored;
       }
@@ -42,20 +42,27 @@ export function ThemeProvider({
     }
 
     try {
-      localStorage.setItem("kasuya_theme", theme);
+      localStorage.setItem("kasuya_theme_v1", theme);
     } catch (error) {
       console.error("Error saving theme:", error);
     }
   }, [theme]);
 
-  const toggleTheme = switchable
-    ? () => {
-        setTheme(prev => (prev === "light" ? "dark" : "light"));
-      }
-    : undefined;
+  const toggleTheme = useCallback(() => {
+    setTheme(prev => (prev === "light" ? "dark" : "light"));
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      theme,
+      toggleTheme: switchable ? toggleTheme : undefined,
+      switchable,
+    }),
+    [theme, switchable, toggleTheme]
+  );
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, switchable }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

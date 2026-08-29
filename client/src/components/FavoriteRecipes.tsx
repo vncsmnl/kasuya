@@ -41,6 +41,24 @@ interface FavoriteRecipesProps {
   currentWaterTotal?: number;
 }
 
+function getFlavorLabel(flavor: string) {
+  const labels: Record<string, string> = {
+    acidity: "Ácido",
+    balanced: "Equilibrado",
+    sweetness: "Doce",
+  };
+  return labels[flavor] || flavor;
+}
+
+function getIntensityLabel(intensity: string) {
+  const labels: Record<string, string> = {
+    soft: "Suave",
+    medium: "Médio",
+    strong: "Forte",
+  };
+  return labels[intensity] || intensity;
+}
+
 export default function FavoriteRecipes({
   recipes,
   onLoadRecipe,
@@ -68,24 +86,6 @@ export default function FavoriteRecipes({
       setNewRecipeName("");
       setIsOpen(false);
     }
-  };
-
-  const getFlavorLabel = (flavor: string) => {
-    const labels: { [key: string]: string } = {
-      acidity: "Ácido",
-      balanced: "Equilibrado",
-      sweetness: "Doce",
-    };
-    return labels[flavor] || flavor;
-  };
-
-  const getIntensityLabel = (intensity: string) => {
-    const labels: { [key: string]: string } = {
-      soft: "Suave",
-      medium: "Médio",
-      strong: "Forte",
-    };
-    return labels[intensity] || intensity;
   };
 
   return (
@@ -118,7 +118,7 @@ export default function FavoriteRecipes({
                   placeholder="Ex: Café da Manhã Ácido"
                   value={newRecipeName}
                   onChange={(e) => setNewRecipeName(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSaveRecipe()}
+                  onKeyDown={(e) => e.key === "Enter" && handleSaveRecipe()}
                 />
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">

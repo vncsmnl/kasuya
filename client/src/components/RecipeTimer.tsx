@@ -1,15 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play, Pause, RotateCcw, Volume2, CheckCircle2 } from "lucide-react";
-
-/**
- * Recipe-Specific Timer Component
- * Artisanal Minimalism Design
- * - Guides through each pour with exact timings
- * - Shows current pour and next pour information
- * - Audio alerts when it's time to pour
- */
 
 interface Pour {
   number: number;
@@ -24,149 +16,116 @@ interface RecipeTimerProps {
   onPourReady?: (pourNumber: number) => void;
 }
 
+const POUR_DURATION = 45;
+const WAIT_BETWEEN_POURS = 5;
+
+function calculatePourTiming(index: number) {
+  const startTime = index * (POUR_DURATION + WAIT_BETWEEN_POURS);
+  const endTime = startTime + POUR_DURATION;
+  return { startTime, endTime };
+}
+
+function formatTime(totalSeconds: number) {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+}
+
+function playBeep(frequency: number, duration: number) {
+  try {
+    const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = frequency;
+    oscillator.type = "sine";
+
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
+  } catch {
+    // Ignore audio errors if audio context is blocked
+  }
+}
+
 export default function RecipeTimer({ pours, recipeName, onPourReady }: RecipeTimerProps) {
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [currentPourIndex, setCurrentPourIndex] = useState(0);
-
-  // Calculate timing for each pour (45 seconds between pours)
-  const POUR_DURATION = 45;
-  const WAIT_BETWEEN_POURS = 5; // 5 seconds wait after pour completes
-
-  // Build timeline: each pour takes 45s, then 5s wait before next
-  const calculatePourTiming = (index: number) => {
-    const startTime = index * (POUR_DURATION + WAIT_BETWEEN_POURS);
-    const endTime = startTime + POUR_DURATION;
-    return { startTime, endTime };
-  };
 
   const totalDuration = pours.length * (POUR_DURATION + WAIT_BETWEEN_POURS);
+  const secondsRef = useRef(0);
+  const soundEnabledRef = useRef(soundEnabled);
+  const onPourReadyRef = useRef(onPourReady);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    secondsRef.current = seconds;
+  }, [seconds]);
 
-    if (isRunning && seconds < totalDuration) {
-      interval = setInterval(() => {
-        setSeconds((prev) => {
-          const next = prev + 1;
+  useEffect(() => {
+    soundEnabledRef.current = soundEnabled;
+  }, [soundEnabled]);
 
-          // Check if we've reached a new pour
-          for (let i = 0; i < pours.length; i++) {
-            const { startTime } = calculatePourTiming(i);
-            if (next === startTime && i !== currentPourIndex) {
-              setCurrentPourIndex(i);
-              if (soundEnabled) {
-                playAlert();
-              }
-              if (onPourReady) {
-                onPourReady(i + 1);
-              }
-            }
+  useEffect(() => {
+    onPourReadyRef.current = onPourReady;
+  }, [onPourReady]);
+
+  useEffect(() => {
+    if (!isRunning) return;
+
+    const interval = setInterval(() => {
+      const nextSeconds = secondsRef.current + 1;
+      secondsRef.current = nextSeconds;
+      setSeconds(nextSeconds);
+
+      if (nextSeconds >= totalDuration) {
+        setIsRunning(false);
+        if (soundEnabledRef.current) {
+          playBeep(1000, 0.8);
+        }
+        return;
+      }
+
+      for (let i = 0; i < pours.length; i++) {
+        const { startTime } = calculatePourTiming(i);
+        if (nextSeconds === startTime) {
+          if (soundEnabledRef.current) {
+            playBeep(800, 0.5);
           }
-
-          // Stop when complete
-          if (next >= totalDuration) {
-            setIsRunning(false);
-            if (soundEnabled) {
-              playCompletionAlert();
-            }
-            return totalDuration;
-          }
-
-          return next;
-        });
-      }, 1000);
-    }
+          onPourReadyRef.current?.(i + 1);
+        }
+      }
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, [isRunning, soundEnabled, currentPourIndex, pours, totalDuration, onPourReady]);
+  }, [isRunning, totalDuration, pours]);
 
-  // Update current pour based on elapsed time
-  useEffect(() => {
-    for (let i = 0; i < pours.length; i++) {
-      const { startTime } = calculatePourTiming(i);
-      if (seconds >= startTime) {
-        setCurrentPourIndex(i);
-      } else {
-        break;
-      }
+  // Determine current pour index
+  let currentPourIndex = 0;
+  for (let i = 0; i < pours.length; i++) {
+    const { startTime } = calculatePourTiming(i);
+    if (seconds >= startTime) {
+      currentPourIndex = i;
+    } else {
+      break;
     }
-  }, [seconds, pours.length]);
-
-  const playAlert = () => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.frequency.value = 800;
-      oscillator.type = "sine";
-
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.5);
-    } catch (e) {
-      console.log("Hora de despejar!");
-    }
-  };
-
-  const playCompletionAlert = () => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.frequency.value = 1000;
-      oscillator.type = "sine";
-
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
-
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.8);
-    } catch (e) {
-      console.log("Preparo completo!");
-    }
-  };
-
-  const formatTime = (totalSeconds: number) => {
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const getCurrentPour = () => pours[currentPourIndex];
-  const getNextPour = () => pours[currentPourIndex + 1];
-
-  const { startTime: currentStartTime } = calculatePourTiming(currentPourIndex);
-  const timeInCurrentPour = seconds - currentStartTime;
-  const timeUntilNextAction = POUR_DURATION - timeInCurrentPour;
+  }
 
   const isCompleted = seconds >= totalDuration;
-  const currentPour = getCurrentPour();
-  const nextPour = getNextPour();
+  const currentPour = pours[currentPourIndex];
+  const nextPour = pours[currentPourIndex + 1];
 
-  const handleStart = () => {
-    setIsRunning(true);
-  };
-
-  const handlePause = () => {
-    setIsRunning(false);
-  };
-
+  const handleStart = () => setIsRunning(true);
+  const handlePause = () => setIsRunning(false);
   const handleReset = () => {
     setIsRunning(false);
+    secondsRef.current = 0;
     setSeconds(0);
-    setCurrentPourIndex(0);
   };
 
   return (
@@ -246,9 +205,9 @@ export default function RecipeTimer({ pours, recipeName, onPourReady }: RecipeTi
         <div className="space-y-2">
           <div className="w-full bg-secondary rounded-full h-2">
             <div
-              className="bg-primary h-full rounded-full transition-all duration-300"
+              className="bg-primary h-full rounded-full transition-[width] duration-300"
               style={{
-                width: `${(seconds / totalDuration) * 100}%`,
+                width: `${totalDuration > 0 ? (seconds / totalDuration) * 100 : 0}%`,
               }}
             />
           </div>
@@ -268,8 +227,8 @@ export default function RecipeTimer({ pours, recipeName, onPourReady }: RecipeTi
 
               return (
                 <div
-                  key={index}
-                  className={`px-3 py-2 rounded text-xs font-mono font-medium transition-all ${
+                  key={pour.number}
+                  className={`px-3 py-2 rounded text-xs font-mono font-medium transition-colors ${
                     isActive
                       ? "bg-primary text-primary-foreground shadow-md"
                       : isDone
@@ -291,7 +250,7 @@ export default function RecipeTimer({ pours, recipeName, onPourReady }: RecipeTi
             <Button
               onClick={handleStart}
               disabled={isCompleted}
-              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 transition-smooth disabled:opacity-50"
+              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 transition-colors disabled:opacity-50"
             >
               <Play className="w-4 h-4 mr-2" />
               Iniciar
@@ -300,7 +259,7 @@ export default function RecipeTimer({ pours, recipeName, onPourReady }: RecipeTi
             <Button
               onClick={handlePause}
               variant="outline"
-              className="flex-1 py-6 transition-smooth"
+              className="flex-1 py-6 transition-colors"
             >
               <Pause className="w-4 h-4 mr-2" />
               Pausar
@@ -310,7 +269,7 @@ export default function RecipeTimer({ pours, recipeName, onPourReady }: RecipeTi
           <Button
             onClick={handleReset}
             variant="outline"
-            className="flex-1 py-6 transition-smooth"
+            className="flex-1 py-6 transition-colors"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Resetar
