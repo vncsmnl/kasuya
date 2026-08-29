@@ -2,6 +2,7 @@
   "name": "kasuya-calculator",
   "version": "1.0.0",
   "type": "module",
+  "packageManager": "pnpm@11.25.0",
   "license": "MIT",
   "scripts": {
     "dev": "vite --host",
