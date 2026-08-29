@@ -1,6 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Coffee } from "lucide-react";
 import RecipeTimerModal from "@/components/RecipeTimerModal";
+import {
+  DoodleCoffeeCup,
+  DoodleTimerClock,
+  DoodleV60,
+  DoodleCitrus,
+  DoodleScale,
+  DoodleSweetness,
+  DoodleFeather,
+  DoodleGauge,
+  DoodleFlame,
+} from "@/components/DoodleIcons";
 
 export interface Pour {
   number: number;
@@ -24,12 +34,17 @@ interface RecipeResultProps {
 export default function RecipeResult({ recipe }: RecipeResultProps) {
   if (!recipe) {
     return (
-      <div className="h-96 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto">
-            <Coffee className="w-8 h-8 text-muted-foreground" />
+      <div className="h-96 flex items-center justify-center border border-dashed border-border rounded-lg bg-card/40">
+        <div className="text-center space-y-4 max-w-xs px-4">
+          <div className="w-20 h-20 bg-secondary/70 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <DoodleV60 size={42} className="text-primary" />
           </div>
-          <p className="text-muted-foreground">Insira valores válidos para calcular a receita</p>
+          <div>
+            <h3 className="font-semibold text-foreground text-lg">Pronto para começar?</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Ajuste as configurações ao lado para gerar sua receita personalizada do método 4:6.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -40,11 +55,14 @@ export default function RecipeResult({ recipe }: RecipeResultProps) {
       {/* Recipe Summary */}
       <Card className="border-border shadow-minimal">
         <CardHeader>
-          <CardTitle className="text-2xl">Sua Receita</CardTitle>
+          <CardTitle className="text-2xl flex items-center gap-2">
+            <DoodleCoffeeCup size={26} className="text-primary inline-block" />
+            <span>Sua Receita</span>
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="space-y-2 p-3 bg-secondary/40 rounded-md border border-border/50">
               <p className="text-xs text-muted-foreground uppercase tracking-widest">
                 Café
               </p>
@@ -53,7 +71,7 @@ export default function RecipeResult({ recipe }: RecipeResultProps) {
                 <span className="text-lg text-muted-foreground ml-1">g</span>
               </p>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 p-3 bg-secondary/40 rounded-md border border-border/50">
               <p className="text-xs text-muted-foreground uppercase tracking-widest">
                 Água Total
               </p>
@@ -67,11 +85,21 @@ export default function RecipeResult({ recipe }: RecipeResultProps) {
           <div className="border-t border-border pt-4 space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Perfil</span>
-              <span className="font-medium text-foreground">{recipe.flavor}</span>
+              <span className="font-medium text-foreground flex items-center gap-1.5">
+                {recipe.flavor === "Ácido" && <DoodleCitrus size={18} className="text-amber-500" />}
+                {recipe.flavor === "Equilibrado" && <DoodleScale size={18} className="text-primary" />}
+                {recipe.flavor === "Doce" && <DoodleSweetness size={18} className="text-rose-500" />}
+                {recipe.flavor}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Intensidade</span>
-              <span className="font-medium text-foreground">{recipe.intensity}</span>
+              <span className="font-medium text-foreground flex items-center gap-1.5">
+                {recipe.intensity === "Suave" && <DoodleFeather size={18} className="text-sky-500" />}
+                {recipe.intensity === "Médio" && <DoodleGauge size={18} className="text-amber-600" />}
+                {recipe.intensity === "Forte" && <DoodleFlame size={18} className="text-red-500" />}
+                {recipe.intensity}
+              </span>
             </div>
           </div>
         </CardContent>
@@ -80,7 +108,10 @@ export default function RecipeResult({ recipe }: RecipeResultProps) {
       {/* Pouring Schedule */}
       <Card className="border-border shadow-minimal">
         <CardHeader>
-          <CardTitle className="text-2xl">Cronograma de Despejos</CardTitle>
+          <CardTitle className="text-2xl flex items-center gap-2">
+            <DoodleTimerClock size={26} className="text-primary inline-block" />
+            <span>Cronograma de Despejos</span>
+          </CardTitle>
           <CardDescription>Siga a sequência abaixo para sua extração perfeita</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -106,7 +137,7 @@ export default function RecipeResult({ recipe }: RecipeResultProps) {
                   </p>
                 </div>
               </div>
-              <div className="w-full bg-background rounded h-1 mt-3">
+              <div className="w-full bg-background rounded h-1.5 mt-3">
                 <div
                   className="bg-primary h-full rounded transition-[width] duration-500"
                   style={{

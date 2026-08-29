@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Clock } from "lucide-react";
+import { DoodleTimerClock } from "@/components/DoodleIcons";
 import RecipeTimer from "@/components/RecipeTimer";
 
 /**
@@ -36,8 +36,8 @@ export default function RecipeTimerModal({ pours, recipeName }: RecipeTimerModal
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 transition-smooth">
-          <Clock className="w-4 h-4 mr-2" />
+        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 transition-colors shadow-sm hover:shadow-md">
+          <DoodleTimerClock size={20} className="mr-2" />
           Iniciar Cronômetro
         </Button>
       </DialogTrigger>

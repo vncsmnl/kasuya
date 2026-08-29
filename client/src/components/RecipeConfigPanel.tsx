@@ -2,7 +2,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Zap, Scale, Heart, Feather, Gauge, Flame, Lock, Unlock } from "lucide-react";
+import { Lock, Unlock } from "lucide-react";
+import {
+  DoodleCitrus,
+  DoodleScale,
+  DoodleSweetness,
+  DoodleFeather,
+  DoodleGauge,
+  DoodleFlame,
+  DoodleCoffeeBean,
+} from "@/components/DoodleIcons";
 
 export interface RecipeConfig {
   coffeeVal: string;
@@ -39,7 +48,10 @@ export default function RecipeConfigPanel({
   return (
     <Card className="border-border shadow-minimal">
       <CardHeader>
-        <CardTitle className="text-2xl">Configuração</CardTitle>
+        <CardTitle className="text-2xl flex items-center gap-2">
+          <DoodleCoffeeBean size={24} className="text-primary inline-block" />
+          <span>Configuração</span>
+        </CardTitle>
         <CardDescription>Defina os parâmetros da sua receita</CardDescription>
       </CardHeader>
       <CardContent className="space-y-8">
@@ -160,7 +172,10 @@ export default function RecipeConfigPanel({
                 htmlFor="acidity"
                 className="flex-1 cursor-pointer font-normal text-foreground"
               >
-                <span className="font-medium flex items-center gap-2"><Zap className="w-4 h-4 text-yellow-500" />Acidez</span>
+                <span className="font-medium flex items-center gap-2">
+                  <DoodleCitrus size={20} className="text-amber-500" />
+                  Acidez
+                </span>
                 <p className="text-xs text-muted-foreground mt-1">
                   Mais brilhante e vivaz
                 </p>
@@ -172,7 +187,10 @@ export default function RecipeConfigPanel({
                 htmlFor="balanced"
                 className="flex-1 cursor-pointer font-normal text-foreground"
               >
-                <span className="font-medium flex items-center gap-2"><Scale className="w-4 h-4 text-blue-500" />Equilibrado</span>
+                <span className="font-medium flex items-center gap-2">
+                  <DoodleScale size={20} className="text-primary" />
+                  Equilibrado
+                </span>
                 <p className="text-xs text-muted-foreground mt-1">
                   Harmonia perfeita entre sabores
                 </p>
@@ -184,7 +202,10 @@ export default function RecipeConfigPanel({
                 htmlFor="sweetness"
                 className="flex-1 cursor-pointer font-normal text-foreground"
               >
-                <span className="font-medium flex items-center gap-2"><Heart className="w-4 h-4 text-pink-500" />Doçura</span>
+                <span className="font-medium flex items-center gap-2">
+                  <DoodleSweetness size={20} className="text-rose-500" />
+                  Doçura
+                </span>
                 <p className="text-xs text-muted-foreground mt-1">
                   Mais suave e adocicado
                 </p>
@@ -206,7 +227,10 @@ export default function RecipeConfigPanel({
                 htmlFor="soft"
                 className="flex-1 cursor-pointer font-normal text-foreground"
               >
-                <span className="font-medium flex items-center gap-2"><Feather className="w-4 h-4 text-sky-400" />Suave</span>
+                <span className="font-medium flex items-center gap-2">
+                  <DoodleFeather size={20} className="text-sky-500" />
+                  Suave
+                </span>
                 <p className="text-xs text-muted-foreground mt-1">
                   Corpo leve e limpo
                 </p>
@@ -218,7 +242,10 @@ export default function RecipeConfigPanel({
                 htmlFor="medium"
                 className="flex-1 cursor-pointer font-normal text-foreground"
               >
-                <span className="font-medium flex items-center gap-2"><Gauge className="w-4 h-4 text-orange-400" />Médio</span>
+                <span className="font-medium flex items-center gap-2">
+                  <DoodleGauge size={20} className="text-amber-600" />
+                  Médio
+                </span>
                 <p className="text-xs text-muted-foreground mt-1">
                   Corpo equilibrado
                 </p>
@@ -230,7 +257,10 @@ export default function RecipeConfigPanel({
                 htmlFor="strong"
                 className="flex-1 cursor-pointer font-normal text-foreground"
               >
-                <span className="font-medium flex items-center gap-2"><Flame className="w-4 h-4 text-red-500" />Forte</span>
+                <span className="font-medium flex items-center gap-2">
+                  <DoodleFlame size={20} className="text-red-500" />
+                  Forte
+                </span>
                 <p className="text-xs text-muted-foreground mt-1">
                   Corpo completo e intenso
                 </p>

@@ -11,8 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Trash2, Heart, Plus } from "lucide-react";
+import { Trash2, Plus } from "lucide-react";
 import { SavedRecipe } from "@/hooks/useFavoriteRecipes";
+import { DoodleSweetness, DoodleCoffeeBean } from "@/components/DoodleIcons";
 
 /**
  * Favorite Recipes Component
@@ -91,15 +92,18 @@ export default function FavoriteRecipes({
   return (
     <Card className="border-border shadow-minimal">
       <CardHeader>
-        <CardTitle className="text-2xl">Receitas Favoritas</CardTitle>
+        <CardTitle className="text-2xl flex items-center gap-2">
+          <DoodleSweetness size={24} className="text-rose-500 inline-block" />
+          <span>Receitas Favoritas</span>
+        </CardTitle>
         <CardDescription>Salve e carregue suas receitas preferidas</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Save Current Recipe */}
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 transition-smooth">
-              <Heart className="w-4 h-4 mr-2" />
+            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 transition-colors">
+              <DoodleSweetness size={18} className="mr-2" />
               Salvar Receita Atual
             </Button>
           </DialogTrigger>
@@ -191,7 +195,7 @@ export default function FavoriteRecipes({
           </div>
         ) : (
           <div className="text-center py-8 text-muted-foreground">
-            <Heart className="w-8 h-8 mx-auto mb-3 opacity-30" />
+            <DoodleSweetness size={32} className="mx-auto mb-3 opacity-30 text-primary" />
             <p className="text-sm">Nenhuma receita salva ainda</p>
             <p className="text-xs mt-1">Crie uma receita e clique em "Salvar Receita Atual"</p>
           </div>

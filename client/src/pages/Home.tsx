@@ -1,10 +1,16 @@
 import { useState, useMemo, useCallback } from "react";
-import { Coffee } from "lucide-react";
 import RecipeConfigPanel from "@/components/RecipeConfigPanel";
 import RecipeResult, { Recipe, Pour } from "@/components/RecipeResult";
 import FavoriteRecipes from "@/components/FavoriteRecipes";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useFavoriteRecipes, SavedRecipe } from "@/hooks/useFavoriteRecipes";
+import {
+  DoodleV60,
+  DoodleKettle,
+  DoodleCoffeeBean,
+  DoodleCoffeeCup,
+  DoodleStamp,
+} from "@/components/DoodleIcons";
 
 function calculateKasuyaRecipe(
   c: number,
@@ -211,37 +217,43 @@ export default function Home() {
       {/* Header with Theme Toggle */}
       <header className="border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Coffee className="w-6 h-6 text-primary" />
-            <h1 className="text-lg font-semibold text-foreground">Kasuya 4:6</h1>
+          <div className="flex items-center gap-2.5">
+            <DoodleV60 size={28} className="text-primary" />
+            <h1 className="text-lg font-semibold text-foreground tracking-tight">Kasuya 4:6</h1>
           </div>
           <ThemeToggle />
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="40" fill="currentColor" className="text-primary" />
-          </svg>
+      {/* Hero Section with Doodle Accents */}
+      <section className="relative overflow-hidden border-b border-border/40 bg-gradient-to-b from-secondary/20 to-background">
+        {/* Background decorative doodles */}
+        <div className="absolute top-6 right-10 md:right-24 opacity-15 dark:opacity-20 pointer-events-none rotate-12 hidden sm:block">
+          <DoodleKettle size={130} className="text-primary" />
         </div>
-        <div className="relative container py-16 md:py-24">
+        <div className="absolute bottom-6 right-32 md:right-64 opacity-15 dark:opacity-20 pointer-events-none -rotate-12 hidden md:block">
+          <DoodleCoffeeBean size={65} className="text-primary" />
+        </div>
+        <div className="absolute top-12 right-2 md:right-10 opacity-15 dark:opacity-20 pointer-events-none rotate-6 hidden lg:block">
+          <DoodleCoffeeCup size={75} className="text-primary" />
+        </div>
+
+        <div className="relative container py-14 md:py-20">
           <div className="max-w-2xl">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="text-sm font-mono text-muted-foreground tracking-widest">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-xs font-mono font-medium text-foreground border border-border">
+                <DoodleStamp size={16} className="text-primary inline-block" />
                 MÉTODO 4:6
               </span>
             </div>
-            <h1 className="text-5xl md:text-6xl text-foreground mb-4 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl text-foreground font-serif mb-4 leading-tight">
               Calculadora Kasuya
             </h1>
-            <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
+            <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
               Calcule sua receita perfeita usando o método 4:6 de Tetsu Kasuya. Customize o perfil
               de sabor e intensidade para obter o café ideal.
-              <br />
-              <br />
-              {/* Japanese Text */}
+            </p>
+            <p className="text-xs text-muted-foreground/80 mt-4 leading-relaxed font-sans">
               テツ・カスヤの4:6メソッドを使って、あなたにぴったりのレシピを計算しましょう。理想のコーヒーを得るために、風味プロファイルと濃さをカスタマイズしてください。
             </p>
           </div>

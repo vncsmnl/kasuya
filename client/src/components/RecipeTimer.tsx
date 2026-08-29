@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Play, Pause, RotateCcw, Volume2, CheckCircle2 } from "lucide-react";
+import { Play, Pause, RotateCcw, Volume2 } from "lucide-react";
+import { DoodleTimerClock, DoodleCoffeeCup, DoodleKettle } from "@/components/DoodleIcons";
 
 interface Pour {
   number: number;
@@ -131,7 +132,10 @@ export default function RecipeTimer({ pours, recipeName, onPourReady }: RecipeTi
   return (
     <Card className="border-border shadow-minimal">
       <CardHeader>
-        <CardTitle className="text-2xl">Cronômetro de Preparo</CardTitle>
+        <CardTitle className="text-2xl flex items-center gap-2">
+          <DoodleTimerClock size={26} className="text-primary inline-block" />
+          <span>Cronômetro de Preparo</span>
+        </CardTitle>
         <CardDescription>
           {recipeName ? `Siga o cronograma para: ${recipeName}` : "Siga o cronograma da sua receita"}
         </CardDescription>
@@ -193,10 +197,10 @@ export default function RecipeTimer({ pours, recipeName, onPourReady }: RecipeTi
 
           {/* Completion Message */}
           {isCompleted && (
-            <div className="p-4 bg-secondary rounded-md border border-border text-center space-y-2">
-              <CheckCircle2 className="w-8 h-8 text-primary mx-auto" />
-              <p className="font-medium text-foreground">Preparo Completo!</p>
-              <p className="text-sm text-muted-foreground">Aproveite seu café perfeito ☕</p>
+            <div className="p-5 bg-secondary/80 rounded-md border border-border text-center space-y-2">
+              <DoodleCoffeeCup size={44} className="text-primary mx-auto" />
+              <p className="font-medium text-foreground text-lg">Preparo Completo!</p>
+              <p className="text-sm text-muted-foreground">Aproveite seu café perfeito artesanal</p>
             </div>
           )}
         </div>
